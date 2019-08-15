@@ -23,30 +23,32 @@ router.post("/api/v1/newmembership", (req, res, next) => {
 });
 
 // READ
-router.get("/api/v1/members", (req, res, next) => {
-    Membership.find().exec()
-        .then(member => res.status(200).send(meber))
-        .catch(err => res.status(404).send(err));
-});
+// router.get("/api/v1/members", (req, res, next) => {
+//     Membership.find().exec()
+//         .then(member => res.status(200).send(meber))
+//         .catch(err => res.status(404).send(err));
+// });
 
 //Search
-router.get("/api/v1/memberById/", (req, res, next) => {
+router.get("/api/v1/memberById", (req, res, next) => {
     const { id } = req.query;
     Membership.findById(id).exec()
         .then(member => res.status(200).send(member))
         .catch(err => res.status(404).send(err));
 });
 
-// router.get("/api/v1/busqueda/pelicula", (req, res, next) => {
-//     const { q } = req.query;
-//     Movie.find({ title: q }).exec()
-//         .then(movie => {
-//             movie.length > 0
-//                 ? res.status(200).send(movie)
-//                 : res.status(404).send("Not found")
-//         })
-//         .catch(err => res.status(404).send(err))
-// });
+router.get("/api/v1/find/member", (req, res, next) => {
+    const { q } = req.query;
+    console.log(q);
+    Membership.find({ member_data:{email: q} }).exec()
+        .then(member => {
+            member.length > 0
+                ? res.status(200).send(member)
+                : res.status(404).send("Not found")
+        })
+        .catch(err => res.status(404).send(err))
+});
+
 
 // UPDATE
 
@@ -67,32 +69,31 @@ router.get("/api/v1/memberById/", (req, res, next) => {
 // });
 
 // Modificar parcialmente el registro
-// router.patch("/api/v1/peliculas/update", (req, res, next) => {
-//     const { id } = req.query;
-//     const body = req.body;
+router.patch("/api/v1/membership/update", (req, res, next) => {
+    const { id } = req.query;
+    const body = req.body;
 
-//     Movie.findByIdAndUpdate(id, { $set: body }, { new: true })
-//         .then(newMovie => {
-//             if (newMovie !== null) {
-//                 res.status(202).send(newMovie)
-//             } else {
-//                 res.status(304).send("Registro no encontrado, imposible modificar")
-//             }
-//         })
-//         .catch(err => res.status(404).send(err))
-// });
+    Membership.findByIdAndUpdate(id, { $set: body }, { new: true })
+        .then(updateMember => {
+            if (updateMember !== null) {
+                res.status(202).send(updateMember)
+            } else {
+                res.status(304).send("Registro no encontrado, imposible modificar")
+            }
+        })
+        .catch(err => res.status(404).send(err))
+});
 
 // DELETE
-// router.delete("/api/v1/peliculas/delete", (req, res, next) => {
-//     const { id } = req.query;
-
-//     Movie.findByIdAndRemove(id).exec()
-//         .then(pelicula => {
-//             pelicula !== null
-//                 ? res.status(200).send({ mensaje: "Película borrada exitosamente", body: pelicula })
-//                 : res.status(304).send({ mensaje: "Registro no eliminado " })
-//         })
-//         .catch(err => res.status(304).send({ mensaje: "Registro no eliminado " }))
-// });
+router.delete("/api/v1/member/delete", (req, res, next) => {
+    const { id } = req.query;
+    Membership.findByIdAndDelete(id).exec()
+        .then(member => {
+            member !== null
+                ? res.status(200).send({ mensaje: "Registro Eliminado Exitosamente", body: member })
+                : res.status(304).send({ mensaje: "Registro no eliminado " })
+        })
+        .catch(err => res.status(304).send({ mensaje: "Registro no eliminado " }))
+});
 
 module.exports = { router };
